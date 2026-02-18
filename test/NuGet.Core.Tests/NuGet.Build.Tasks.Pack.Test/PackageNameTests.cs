@@ -32,7 +32,10 @@ namespace NuGet.Build.Tasks.Pack.Test
 
         private readonly bool _isDotNetFramework = false;
         private readonly string _testFrameworkMoniker = "netstandard2.0";
-
+#if IS_DESKTOP
+        private const string SdkVersion = "10";
+        private const string SdkTfm = "net10.0";
+#endif
         private readonly string _pathDotnetExe = "";
         private readonly string _pathMSBuildExe = "";
         private readonly string _pathDllFile;
@@ -43,8 +46,20 @@ namespace NuGet.Build.Tasks.Pack.Test
         public PackageFileNameTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-
             _pathDotnetExe = NuGet.Test.Utility.TestFileSystemUtility.GetDotnetCli();
+
+
+            string testAssemblyPath = Path.GetFullPath(System.Reflection.Assembly.GetExecutingAssembly().Location);
+#if IS_DESKTOP
+            var _cliDirectory = TestDotnetCLiUtility.CopyAndPatchLatestDotnetCli(SdkVersion, SdkTfm);
+            //var _cliDirectory = TestDotnetCLiUtility.CopyAndPatchLatestDotnetCli(testAssemblyPath, "10.0.200-preview.0.25609.107");
+#else
+            var _cliDirectory = TestDotnetCLiUtility.CopyAndPatchLatestDotnetCli(testAssemblyPath);
+#endif
+            var dotnetExecutableName = NuGet.Common.RuntimeEnvironmentHelper.IsWindows ? "dotnet.exe" : "dotnet";
+            _pathDotnetExe = Path.Combine(_cliDirectory, dotnetExecutableName);
+
+
             _pathMSBuildExe = GetMsBuildExePath();
             _testFrameworkMoniker = GetFrameworkMoniker(typeof(NuGet.Build.Tasks.Pack.GetPackOutputItemsTask), out var isDotNetFramework);
             _isDotNetFramework = isDotNetFramework;
@@ -77,6 +92,19 @@ namespace NuGet.Build.Tasks.Pack.Test
 
             Assert.True(System.IO.File.Exists(_pathDllFile), $"{FILENAME_DLL} missing");
             Assert.True(System.IO.File.Exists(_pathTargetsFile), $"{FILENAME_TARGETS} missing");
+
+
+
+            var fileVerInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(_pathDotnetExe);
+
+            _testOutputHelper.WriteLine($"""
+                Dotnet_Path= {_pathDotnetExe}
+                FileVersion = {fileVerInfo.FileVersion}
+                ProductVersion = {fileVerInfo.ProductVersion}
+                FileDescription = {fileVerInfo.FileDescription}
+                """);
+
+            var sdklists = CommandRunner.Run(_pathDotnetExe, null, "--list-sdks", testOutputHelper: testOutputHelper);
         }
 
         #endregion
@@ -192,12 +220,17 @@ namespace NuGet.Build.Tasks.Pack.Test
                 }
                 else
                 {
+
+
                     // dotnet build
+
                     runresultDotnetPack = CommandRunner.Run(
                                        _pathDotnetExe,
                                        testDirectory,
                                        $"build -p:Configuration={CONFIGURATION} {FILENAME_PROJECT_FILE}",
                                        testOutputHelper: _testOutputHelper);
+
+
                 }
                 Assert.True(0 == runresultDotnetPack.ExitCode, runresultDotnetPack.Output + " " + runresultDotnetPack.Errors);
 
