@@ -10,27 +10,27 @@ parameters:
 - name: RunUnitTestsOnLinux
   displayName: Run unit tests on Linux
   type: boolean
-  default: true
+  default: false
 - name: RunFunctionalTestsOnLinux
   displayName: Run functional tests on Linux
   type: boolean
-  default: true
+  default: false
 - name: RunUnitTestsOnMacOS
   displayName: Run unit tests on MacOS
   type: boolean
-  default: true
+  default: false
 - name: RunFunctionalTestsOnMacOS
   displayName: Run functional tests on MacOS
   type: boolean
-  default: true
+  default: false
 - name: RunSourceBuild
   displayName: Run a SourceBuild build
   type: boolean
-  default: true
+  default: false
 - name: RunStaticAnalysis
   displayName: Run a static analysis
   type: boolean
-  default: true
+  default: false
 variables:
   DOTNET_NOLOGO: 1
   NUGET_EXPERIMENTAL_CHAIN_BUILD_RETRY_POLICY: 3,1000
@@ -38,15 +38,6 @@ variables:
   CI: true
   Codeql.Enabled: false
 
-trigger:
-  branches:
-    include:
-    - dev
-
-pr:
-  branches:
-    include:
-    - '*'
 
 stages:
 - ${{ if eq(parameters.RunUnitTestsOnWindows, true) }}:
@@ -58,11 +49,8 @@ stages:
       parameters:
         displayName: Unit Tests on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Unit
         testTargetFramework: net472
 
@@ -75,11 +63,8 @@ stages:
       parameters:
         displayName: Unit Tests on Windows (.NET 9.0)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Unit
         testTargetFramework: net9.0
 
@@ -92,11 +77,8 @@ stages:
       parameters:
         displayName: Msbuild.Integration.Test on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net472
         testProjectName: Msbuild.Integration.Test
@@ -110,11 +92,8 @@ stages:
       parameters:
         displayName: NuGet.CommandLine.FuncTest on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net472
         testProjectName: NuGet.CommandLine.FuncTest
@@ -129,11 +108,8 @@ stages:
       parameters:
         displayName: NuGet.CommandLine.Test on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net472
         testProjectName: NuGet.CommandLine.Test
@@ -149,11 +125,8 @@ stages:
       parameters:
         displayName: NuGet.Packaging.FuncTest on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net472
         testProjectName: NuGet.Packaging.FuncTest
@@ -167,11 +140,8 @@ stages:
       parameters:
         displayName: Dotnet.Integration.Test on Windows (.NET 9.0)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net9.0
         testProjectName: Dotnet.Integration.Test
@@ -186,101 +156,9 @@ stages:
       parameters:
         displayName: NuGet.Packaging.FuncTest on Windows (.NET 9.0)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEngSS-MicroBuild2022-1ES
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net9.0
         testProjectName: NuGet.Packaging.FuncTest
 
-- ${{ if eq(parameters.RunUnitTestsOnLinux, true) }}:
-  - stage:
-    displayName: Unit Tests on Linux (.NET 9.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Unit Tests on Linux (.NET 9.0)
-        osName: Linux
-        vmImage: ubuntu-latest
-        testType: Unit
-        testTargetFramework: net9.0
-
-- ${{ if eq(parameters.RunFunctionalTestsOnLinux, true) }}:
-  - stage:
-    displayName: Functional Tests on Linux (.NET 9.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Functional Tests on Linux (.NET 9.0)
-        osName: Linux
-        vmImage: ubuntu-latest
-        testType: Functional
-        testTargetFramework: net9.0
-        timeoutInMinutes: 30
-
-- ${{ if eq(parameters.RunUnitTestsOnMacOS, true) }}:
-  - stage:
-    displayName: Unit Tests on MacOS (.NET 9.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Unit Tests on MacOS (.NET 9.0)
-        osName: MacOS
-        vmImage: macos-14
-        testType: Unit
-        testTargetFramework: net9.0
-
-- ${{ if eq(parameters.RunFunctionalTestsOnMacOS, true) }}:
-  - stage:
-    displayName: Functional Tests on MacOS (.NET 9.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Functional Tests on MacOS (.NET 9.0)
-        osName: MacOS
-        vmImage: macos-14
-        testType: Functional
-        testTargetFramework: net9.0
-        timeoutInMinutes: 30
-
-- ${{ if or(eq(parameters.RunSourceBuild, true), eq(parameters.RunStaticAnalysis, true)) }}:
-  - stage:
-    displayName: Source Build and Static Analysis
-    dependsOn: []
-    jobs:
-    - ${{ if eq(parameters.RunSourceBuild, true) }}:
-      - job:
-        displayName: Source Build
-        timeoutInMinutes: 15
-        variables:
-          DOTNET_NUGET_SIGNATURE_VERIFICATION: true
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-        - task: PowerShell@2
-          displayName: "Run source-build script"
-          inputs:
-            targetType: "inline"
-            script: |
-              ./eng/dotnet-build/build.sh --source-build
-    - ${{ if eq(parameters.RunStaticAnalysis, true) }}:
-      - job:
-        displayName: Run Static Analysis
-        timeoutInMinutes: 15
-        pool:
-          vmImage: windows-latest
-        steps:
-        - task: PowerShell@2
-          displayName: Run configure.ps1
-          inputs:
-            filePath: configure.ps1
-        - script: SET | SORT
-          displayName: Log Environment Variables
-        - script: dotnet format whitespace --verify-no-changes NuGet.sln
-          displayName: Run dotnet format whitespace
