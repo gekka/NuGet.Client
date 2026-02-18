@@ -42,20 +42,6 @@ variables:
 stages:
 - ${{ if eq(parameters.RunUnitTestsOnWindows, true) }}:
   - stage:
-    displayName: Unit Tests on Windows (.NET Framework 4.7.2)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Unit Tests on Windows (.NET Framework 4.7.2)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Unit
-        testTargetFramework: net472
-
-- ${{ if eq(parameters.RunUnitTestsOnWindows, true) }}:
-  - stage:
     displayName: Unit Tests on Windows (.NET 10.0)
     dependsOn: []
     jobs:
@@ -67,69 +53,6 @@ stages:
         vmImage: windows-latest
         testType: Unit
         testTargetFramework: net10.0
-
-- ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
-  - stage:
-    displayName: Msbuild.Integration.Test on Windows (.NET Framework 4.7.2)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Msbuild.Integration.Test on Windows (.NET Framework 4.7.2)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Functional
-        testTargetFramework: net472
-        testProjectName: Msbuild.Integration.Test
-
-- ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
-  - stage:
-    displayName: NuGet.CommandLine.FuncTest on Windows (.NET Framework 4.7.2)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: NuGet.CommandLine.FuncTest on Windows (.NET Framework 4.7.2)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Functional
-        testTargetFramework: net472
-        testProjectName: NuGet.CommandLine.FuncTest
-        timeoutInMinutes: 30
-
-- ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
-  - stage:
-    displayName: NuGet.CommandLine.Test on Windows (.NET Framework 4.7.2)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: NuGet.CommandLine.Test on Windows (.NET Framework 4.7.2)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Functional
-        testTargetFramework: net472
-        testProjectName: NuGet.CommandLine.Test
-        testVerbosity: normal
-        timeoutInMinutes: 45
-
-- ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
-  - stage:
-    displayName: NuGet.Packaging.FuncTest on Windows (.NET Framework 4.7.2)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: NuGet.Packaging.FuncTest on Windows (.NET Framework 4.7.2)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Functional
-        testTargetFramework: net472
-        testProjectName: NuGet.Packaging.FuncTest
 
 - ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
   - stage:

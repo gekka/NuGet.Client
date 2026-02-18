@@ -92,7 +92,7 @@ jobs:
       VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
     inputs:
       command: test
-      projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+      # projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
       arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
       ${{ if ne(parameters.testProjectName, '') }}:
         testRunTitle: ${{ parameters.osName }} $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))

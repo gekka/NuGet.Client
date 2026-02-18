@@ -93,18 +93,19 @@ namespace NuGet.Build.Tasks.Pack.Test
                     new PackageFileNameTestCase("002",["proj.2.0.0.1.nupkg"        ], "proj", "nusp", "2.0.0.1", "       ", "4.0.0.1", false),
                     new PackageFileNameTestCase("003",["proj.2.0.0.2.nupkg"        ], "proj", "nusp", "2.0.0.2", "3.0.0.2", "4.0.0.2", false),
                     new PackageFileNameTestCase("004",["proj.2.0.0.3-preview.nupkg"], "proj", "nusp", "2.0.0.3-preview", "3.0.0.2", "4.0.0.2", false),
+                    new PackageFileNameTestCase("005",["proj.2.0.0.4-release.nupkg"], "proj", "$meta_id$", "2.0.0.4-release", "3.0.0.2", "$meta_version$", false),
                     new PackageFileNameTestCase("100",["proj.nupkg"                ], "proj", "nusp", "1.9", "", "", false, OutputFileNamesWithoutVersion:true),
                     new PackageFileNameTestCase("104",["proj.nupkg"                ], "proj", "nusp", "2.0.0.3-preview", "3.0.0.2", "4.0.0.2", false,OutputFileNamesWithoutVersion:true),
 
                     // with nuspec input
-                    new PackageFileNameTestCase("010",["nusp.4.0.0.nupkg"          ], "proj", "nusp", "2.0.0.0", "         ", "4.0.0.0", true),
-                    new PackageFileNameTestCase("011",["nusp.4.0.0.3.nupkg"        ], "proj", "nusp", "2.0.0.3", "         ", "4.0.0.3", true),
+                    new PackageFileNameTestCase("010",["nusp.4.0.0.nupkg"          ], "proj", "nusp", "2.0.0.0", "       ", "4.0.0.0", true),
+                    new PackageFileNameTestCase("011",["nusp.4.0.0.3.nupkg"        ], "proj", "nusp", "2.0.0.3", "       ", "4.0.0.3", true),
                     new PackageFileNameTestCase("012",["nusp.3.0.0.4.nupkg"        ], "proj", "nusp", "2.0.0.4", "3.0.0.4", "4.0.0.4", true),
-                    new PackageFileNameTestCase("013",["nusp.5.0.0-preview.nupkg"  ], "proj", "nusp", "2.0.0.0", "         ", "5.0.0.0-preview", true),
-                    new PackageFileNameTestCase("014",["nusp.5.0.0.2-preview.nupkg"], "proj", "nusp", "2.0.0.0", "         ", "5.0.0.2-preview", true),
-                    new PackageFileNameTestCase("015",["nusp.6.0.0-beta.nupkg"     ], "proj", "nusp", "2.0.0.0", "6-beta   ", "5.0.0.3-preview", true),
-                    new PackageFileNameTestCase("110",["nusp.nupkg"                ], "proj", "nusp", "2.0.0.0", "         ", "4.0.0.0", true, OutputFileNamesWithoutVersion:true),
-                    new PackageFileNameTestCase("115",["nusp.nupkg"                ], "proj", "nusp", "2.0.0.0", "6-beta   ", "5.0.0.3-preview", true, OutputFileNamesWithoutVersion:true),
+                    new PackageFileNameTestCase("013",["nusp.5.0.0-preview.nupkg"  ], "proj", "nusp", "2.0.0.0", "       ", "5.0.0.0-preview", true),
+                    new PackageFileNameTestCase("014",["nusp.5.0.0.2-preview.nupkg"], "proj", "nusp", "2.0.0.0", "       ", "5.0.0.2-preview", true),
+                    new PackageFileNameTestCase("015",["nusp.6.0.0-beta.nupkg"     ], "proj", "nusp", "2.0.0.0", "6-beta ", "5.0.0.3-preview", true),
+                    new PackageFileNameTestCase("110",["nusp.nupkg"                ], "proj", "nusp", "2.0.0.0", "       ", "4.0.0.0", true, OutputFileNamesWithoutVersion:true),
+                    new PackageFileNameTestCase("115",["nusp.nupkg"                ], "proj", "nusp", "2.0.0.0", "6-beta ", "5.0.0.3-preview", true, OutputFileNamesWithoutVersion:true),
 
                     // has symbol
                     new PackageFileNameTestCase("020",["proj.2.1.0.snupkg"], "proj", "nusp", "2.1.0.0", "7.1.1", "5.0.0.3-preview", false, IncludeSymbols: true,SymbolPackageFormat: NuGet.Commands.SymbolPackageFormat.Snupkg ),
