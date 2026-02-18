@@ -49,8 +49,8 @@ stages:
       parameters:
         displayName: Unit Tests on Windows (.NET 10.0)
         osName: Windows
-        agentPool: NetCore-Public
-        agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Unit
         testTargetFramework: net10.0
 
@@ -63,8 +63,8 @@ stages:
       parameters:
         displayName: Dotnet.Integration.Test on Windows (.NET 10.0)
         osName: Windows
-        agentPool: NetCore-Public
-        agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net10.0
         testProjectName: Dotnet.Integration.Test
@@ -79,8 +79,8 @@ stages:
       parameters:
         displayName: NuGet.Packaging.FuncTest on Windows (.NET 10.0)
         osName: Windows
-        agentPool: NetCore-Public
-        agentDemands: ImageOverride -equals Windows.VS2022.Amd64.Open
+        agentPool: Azure Pipelines
+        vmImage: windows-latest
         testType: Functional
         testTargetFramework: net10.0
         testProjectName: NuGet.Packaging.FuncTest
