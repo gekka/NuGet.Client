@@ -197,7 +197,9 @@ namespace NuGet.Build.Tasks.Pack.Test
 
     <PropertyGroup>
         <TargetFramework>{_testFixture._testFrameworkMoniker}</TargetFramework>
+        <NoWarn>NU5100;NU5119;CS2008</NoWarn>
     </PropertyGroup>
+
     <PropertyGroup>
         <IsPackable>true</IsPackable>
 

@@ -5,4 +5,8 @@
   </PropertyGroup>
   <!-- Empty target for Xliff update -->
   <Target Name="UpdateXlf" />
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\TestCultureModule.cs" Link="TestCultureModule.cs" />
+  </ItemGroup>
 </Project>
