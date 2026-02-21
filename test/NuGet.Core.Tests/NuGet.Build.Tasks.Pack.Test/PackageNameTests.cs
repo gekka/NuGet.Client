@@ -54,7 +54,7 @@ namespace NuGet.Build.Tasks.Pack.Test
                     new PackageFileNameTestCase("004",["proj.2.0.0.3-preview.nupkg"], "proj", "nusp", "2.0.0.3-preview", "3.0.0.2", "4.0.0.2", false),
                     new PackageFileNameTestCase("005",["proj.2.0.0.4-release.nupkg"], "proj", "$meta_id$", "2.0.0.4-release", "3.0.0.2", "$meta_version$", false),
                     new PackageFileNameTestCase("100",["proj.nupkg"                ], "proj", "nusp", "1.9", "", "", false, OutputFileNamesWithoutVersion:true),
-                    new PackageFileNameTestCase("104",["proj.nupkg"                ], "proj", "nusp", "2.0.0.3-preview", "3.0.0.2", "4.0.0.2", false,OutputFileNamesWithoutVersion:true),
+                    new PackageFileNameTestCase("104",["proj.nupkg"                ], "proj", "nusp", "2.0.0.3-preview", "3.0.0.2", "4.0.0.2", false, OutputFileNamesWithoutVersion:true),
 
                     // with nuspec input
                     new PackageFileNameTestCase("010",["nusp.4.0.0.nupkg"          ], "proj", "nusp", "2.0.0.0", "       ", "4.0.0.0", true),
@@ -75,9 +75,8 @@ namespace NuGet.Build.Tasks.Pack.Test
                     new PackageFileNameTestCase("022",["proj.2.2.0.nupkg", "proj.2.2.0.symbols.nupkg"], "proj", "nusp", "2.2.0.0", "7.1.1", "5.0.0.3-preview", false, IncludeSymbols: true,SymbolPackageFormat: NuGet.Commands.SymbolPackageFormat.SymbolsNupkg ),
                     new PackageFileNameTestCase("023",["nusp.7.2.2.nupkg", "nusp.7.2.2.symbols.nupkg"], "proj", "nusp", "2.0.0.0", "7.2.2", "5.0.0.4-preview", true, IncludeSymbols: true,SymbolPackageFormat: NuGet.Commands.SymbolPackageFormat.SymbolsNupkg ),
                     new PackageFileNameTestCase("122",["proj.nupkg", "proj.symbols.nupkg"            ], "proj", "nusp", "2.2.0.0", "7.1.1", "5.0.0.3-preview", false, IncludeSymbols: true,SymbolPackageFormat: NuGet.Commands.SymbolPackageFormat.SymbolsNupkg, OutputFileNamesWithoutVersion:true),
-
                     new PackageFileNameTestCase("123",["nusp.nupkg", "nusp.symbols.nupkg"            ], "proj", "nusp", "2.0.0.0", "7.2.2", "5.0.0.4-preview", true, IncludeSymbols: true,SymbolPackageFormat: NuGet.Commands.SymbolPackageFormat.SymbolsNupkg, OutputFileNamesWithoutVersion:true),
-                    // NoVersion
+
                      };
 
 
