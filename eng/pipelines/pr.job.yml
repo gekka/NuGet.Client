@@ -56,13 +56,13 @@ jobs:
   steps:
   - ${{ if eq(parameters.osName, 'Windows') }}:
     - task: PowerShell@2
-      displayName: Run configure.ps1
+      displayName: Run- configure.ps1
       inputs:
         filePath: configure.ps1
         pwsh: true
   - ${{ else }}:
     - task: Bash@3
-      displayName: Run configure.sh
+      displayName: Run+ configure.sh
       env:
         RESTORE_NUGET_PACKAGES: false
       inputs:
