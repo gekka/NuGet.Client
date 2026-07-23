@@ -59,6 +59,8 @@ jobs:
       displayName: Run configure.ps1
       inputs:
         filePath: configure.ps1
+      Advanced:
+        pwsh: true
   - ${{ else }}:
     - task: Bash@3
       displayName: Run configure.sh
