@@ -51,6 +51,8 @@ param (
 
 . "$PSScriptRoot\build\common.ps1"
 
+Initialize-DeveloperPowerShell
+
 if (-not $Configuration) {
     $Configuration = switch ($CI.IsPresent) {
         $True   { 'Release' } # CI build is Release by default
@@ -62,8 +64,9 @@ Write-Host ("`r`n" * 3)
 Trace-Log ('=' * 60)
 
 $startTime = [DateTime]::UtcNow
-if (-not $BuildNumber) {
-    $BuildNumber = Get-BuildNumber
+$pBuildNumber =""
+if ($BuildNumber) {
+    $pBuildNumber = "/p:BuildNumber=$($BuildNumber)"
 }
 
 Invoke-BuildStep 'Installing .NET CLI for tests' {
@@ -74,8 +77,9 @@ Trace-Log "Test suite run #$BuildNumber started at $startTime"
 
 Test-BuildEnvironment -CI:$CI
 
-if (-not $VSToolsetInstalled) {
-    Warning-Log "The build is requested, but no toolset is available"
+$MSBuildExe = Get-MSBuildExe
+if(-not $MSBuildExe){
+    Warning-Log "The build is requested, but no MSBuild is available"
     exit 1
 }
 
@@ -89,7 +93,7 @@ Invoke-BuildStep 'Cleaning package cache' {
 
 Invoke-BuildStep 'Running /t:RestoreVS' {
 
-    & $MSBuildExe build\build.proj /t:RestoreVS /p:Configuration=$Configuration /p:ReleaseLabel=$ReleaseLabel /p:BuildNumber=$BuildNumber /v:m /m:1
+    & $MSBuildExe build\build.proj /t:RestoreVS /p:Configuration=$Configuration /p:ReleaseLabel=$ReleaseLabel $pBuildNumber /v:m /m:1
 
     if (-not $?)
     {
@@ -103,7 +107,7 @@ Invoke-BuildStep 'Running /t:RestoreVS' {
 
 Invoke-BuildStep 'Running /t:CoreFuncTests' {
 
-    & $MSBuildExe build\build.proj /t:CoreFuncTests /p:Configuration=$Configuration /p:ReleaseLabel=$ReleaseLabel /p:BuildNumber=$BuildNumber /v:m /m:1
+    & $MSBuildExe build\build.proj /t:CoreFuncTests /p:Configuration=$Configuration /p:ReleaseLabel=$ReleaseLabel $pBuildNumber /v:m #/m:1
 
     if (-not $?)
     {

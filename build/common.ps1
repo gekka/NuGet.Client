@@ -388,3 +388,19 @@ Function Download-FileWithRetry {
         }
     }
 }
+
+Function Initialize-DeveloperPowerShell{
+    if($Env:VSCMD_VER){
+        return
+    }
+
+    $vsRoot = Get-LatestVisualStudioRoot
+    $LaunchVsDevShell = [IO.Path]::Combine($vsRoot, "Common7", "Tools", "Launch-VsDevShell.ps1")
+    if(-not (Test-Path $LaunchVsDevShell -PathType Leaf)){
+        Error-Log 'Launch-VsDevShell.ps1 is not found. Please run in Developer Powershell or CommandPrompt.' -Fatal
+    }
+    & $LaunchVsDevShell
+    & $PSCommandPath # reset constants in this file
+}
+
+
