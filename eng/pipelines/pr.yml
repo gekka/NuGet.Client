@@ -58,11 +58,6 @@ stages:
       parameters:
         displayName: Unit Tests on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Unit
         testTargetFramework: net472
 
@@ -75,11 +70,6 @@ stages:
       parameters:
         displayName: Unit Tests on Windows (.NET 10.0)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Unit
         testTargetFramework: net10.0
 
@@ -92,11 +82,6 @@ stages:
       parameters:
         displayName: Msbuild.Integration.Test on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: net472
         testProjectName: Msbuild.Integration.Test
@@ -110,11 +95,6 @@ stages:
       parameters:
         displayName: NuGet.CommandLine.FuncTest on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: net472
         testProjectName: NuGet.CommandLine.FuncTest
@@ -129,11 +109,6 @@ stages:
       parameters:
         displayName: NuGet.CommandLine.Test on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: net472
         testProjectName: NuGet.CommandLine.Test
@@ -149,11 +124,6 @@ stages:
       parameters:
         displayName: NuGet.Packaging.FuncTest on Windows (.NET Framework 4.7.2)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: net472
         testProjectName: NuGet.Packaging.FuncTest
@@ -167,11 +137,6 @@ stages:
       parameters:
         displayName: Dotnet.Integration.Test on Windows (.NET 10.0)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: net10.0
         testProjectName: Dotnet.Integration.Test
@@ -186,11 +151,6 @@ stages:
       parameters:
         displayName: Dotnet.Integration.Test on Windows (SDK Next)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: sdkNext
         testProjectName: Dotnet.Integration.Test
@@ -206,11 +166,6 @@ stages:
       parameters:
         displayName: NuGet.Packaging.FuncTest on Windows (.NET 10.0)
         osName: Windows
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          agentPool: NetCore-Public
-          agentDemands: ImageOverride -equals Windows.VS2026.Amd64.Open
-        ${{ else }}:
-          agentPool: VSEng-MicroBuildVSStable
         testType: Functional
         testTargetFramework: net10.0
         testProjectName: NuGet.Packaging.FuncTest
