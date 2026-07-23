@@ -32,146 +32,478 @@ parameters:
   type: boolean
   default: false
 variables:
-  DOTNET_NOLOGO: 1
-  NUGET_EXPERIMENTAL_CHAIN_BUILD_RETRY_POLICY: 3,1000
-  SkipSigning: true
-  CI: true
-  Codeql.Enabled: false
-
-
-
+- name: DOTNET_NOLOGO
+  value: 1
+- name: NUGET_EXPERIMENTAL_CHAIN_BUILD_RETRY_POLICY
+  value: 3,1000
+- name: SkipSigning
+  value: true
+- name: CI
+  value: true
+- name: Codeql.Enabled
+  value: false
 stages:
-- ${{ if eq(parameters.RunUnitTestsOnWindows, true) }}:
-  - stage:
+- stage: ''
+  displayName: Unit Tests on Windows (.NET Framework 4.7.2)
+  dependsOn: []
+  jobs:
+  - job: ''
+    displayName: Unit Tests on Windows (.NET Framework 4.7.2)
+    variables:
+    - name: TestType
+      value: Unit
+    - name: TestTargetFramework
+      value: net472
+    - name: TestProjectName
+      value: ''
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 15
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: Unit Tests on Windows (.NET 10.0)
+  dependsOn: []
+  jobs:
+  - job: ''
     displayName: Unit Tests on Windows (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Unit Tests on Windows (.NET 10.0)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Unit
-        testTargetFramework: net10.0
-
-- ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
-  - stage:
+    variables:
+    - name: TestType
+      value: Unit
+    - name: TestTargetFramework
+      value: net10.0
+    - name: TestProjectName
+      value: ''
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 15
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: Msbuild.Integration.Test on Windows (.NET Framework 4.7.2)
+  dependsOn: []
+  jobs:
+  - job: ''
+    displayName: Msbuild.Integration.Test on Windows (.NET Framework 4.7.2)
+    variables:
+    - name: TestType
+      value: Functional
+    - name: TestTargetFramework
+      value: net472
+    - name: TestProjectName
+      value: Msbuild.Integration.Test
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 15
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: NuGet.CommandLine.FuncTest on Windows (.NET Framework 4.7.2)
+  dependsOn: []
+  jobs:
+  - job: ''
+    displayName: NuGet.CommandLine.FuncTest on Windows (.NET Framework 4.7.2)
+    variables:
+    - name: TestType
+      value: Functional
+    - name: TestTargetFramework
+      value: net472
+    - name: TestProjectName
+      value: NuGet.CommandLine.FuncTest
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 30
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: NuGet.CommandLine.Test on Windows (.NET Framework 4.7.2)
+  dependsOn: []
+  jobs:
+  - job: ''
+    displayName: NuGet.CommandLine.Test on Windows (.NET Framework 4.7.2)
+    variables:
+    - name: TestType
+      value: Functional
+    - name: TestTargetFramework
+      value: net472
+    - name: TestProjectName
+      value: NuGet.CommandLine.Test
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: normal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 45
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: NuGet.Packaging.FuncTest on Windows (.NET Framework 4.7.2)
+  dependsOn: []
+  jobs:
+  - job: ''
+    displayName: NuGet.Packaging.FuncTest on Windows (.NET Framework 4.7.2)
+    variables:
+    - name: TestType
+      value: Functional
+    - name: TestTargetFramework
+      value: net472
+    - name: TestProjectName
+      value: NuGet.Packaging.FuncTest
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 15
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: Dotnet.Integration.Test on Windows (.NET 10.0)
+  dependsOn: []
+  jobs:
+  - job: ''
     displayName: Dotnet.Integration.Test on Windows (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Dotnet.Integration.Test on Windows (.NET 10.0)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Functional
-        testTargetFramework: net10.0
-        testProjectName: Dotnet.Integration.Test
-        timeoutInMinutes: 60
-
-- ${{ if eq(parameters.RunFunctionalTestsOnWindows, true) }}:
-  - stage:
+    variables:
+    - name: TestType
+      value: Functional
+    - name: TestTargetFramework
+      value: net10.0
+    - name: TestProjectName
+      value: Dotnet.Integration.Test
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 60
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
+- stage: ''
+  displayName: NuGet.Packaging.FuncTest on Windows (.NET 10.0)
+  dependsOn: []
+  jobs:
+  - job: ''
     displayName: NuGet.Packaging.FuncTest on Windows (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: NuGet.Packaging.FuncTest on Windows (.NET 10.0)
-        osName: Windows
-        agentPool: Azure Pipelines
-        vmImage: windows-latest
-        testType: Functional
-        testTargetFramework: net10.0
-        testProjectName: NuGet.Packaging.FuncTest
-
-- ${{ if eq(parameters.RunUnitTestsOnLinux, true) }}:
-  - stage:
-    displayName: Unit Tests on Linux (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Unit Tests on Linux (.NET 10.0)
-        osName: Linux
-        vmImage: ubuntu-latest
-        testType: Unit
-        testTargetFramework: net10.0
-
-- ${{ if eq(parameters.RunFunctionalTestsOnLinux, true) }}:
-  - stage:
-    displayName: Functional Tests on Linux (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Functional Tests on Linux (.NET 10.0)
-        osName: Linux
-        vmImage: ubuntu-latest
-        testType: Functional
-        testTargetFramework: net10.0
-        timeoutInMinutes: 30
-
-- ${{ if eq(parameters.RunUnitTestsOnMacOS, true) }}:
-  - stage:
-    displayName: Unit Tests on MacOS (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Unit Tests on MacOS (.NET 10.0)
-        osName: MacOS
-        vmImage: macos-14
-        testType: Unit
-        testTargetFramework: net10.0
-
-- ${{ if eq(parameters.RunFunctionalTestsOnMacOS, true) }}:
-  - stage:
-    displayName: Functional Tests on MacOS (.NET 10.0)
-    dependsOn: []
-    jobs:
-    - template: pr.job.yml
-      parameters:
-        displayName: Functional Tests on MacOS (.NET 10.0)
-        osName: MacOS
-        vmImage: macos-14
-        testType: Functional
-        testTargetFramework: net10.0
-        timeoutInMinutes: 30
-
-- ${{ if or(eq(parameters.RunSourceBuild, true), eq(parameters.RunStaticAnalysis, true)) }}:
-  - stage:
-    displayName: Source Build and Static Analysis
-    dependsOn: []
-    jobs:
-    - ${{ if eq(parameters.RunSourceBuild, true) }}:
-      - job:
-        displayName: Source Build
-        timeoutInMinutes: 15
-        variables:
-          DOTNET_NUGET_SIGNATURE_VERIFICATION: true
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-        - task: PowerShell@2
-          displayName: "Run source-build script"
-          inputs:
-            targetType: "inline"
-            script: |
-              ./eng/dotnet-build/build.sh --source-build
-    - ${{ if eq(parameters.RunStaticAnalysis, true) }}:
-      - job:
-        displayName: Run Static Analysis
-        timeoutInMinutes: 15
-        pool:
-          vmImage: windows-latest
-        steps:
-        - task: PowerShell@2
-          displayName: Run configure.ps1
-          inputs:
-            filePath: configure.ps1
-        - script: SET | SORT
-          displayName: Log Environment Variables
-        - script: dotnet format whitespace --verify-no-changes NuGet.sln
-          displayName: Run dotnet format whitespace
+    variables:
+    - name: TestType
+      value: Functional
+    - name: TestTargetFramework
+      value: net10.0
+    - name: TestProjectName
+      value: NuGet.Packaging.FuncTest
+    - name: BinlogDirectory
+      value: $(Agent.TempDirectory)\binlogs\
+    - name: VSTestVerbosity
+      value: minimal
+    pool:
+      name: Azure Pipelines
+      vmImage: windows-latest
+    steps:
+    - task: PowerShell@2
+      displayName: Run configure.ps1
+      inputs:
+        filePath: configure.ps1
+    - task: CmdLine@2
+      displayName: Log Environment Variables
+      inputs:
+        script: SET | SORT
+    - task: MSBuild@1
+      displayName: Restore and Build $(TestType) Test Projects
+      inputs:
+        solution: NuGet.sln
+        msbuildArchitecture: x64
+        msbuildArguments: --binarylogger:"$(BinlogDirectory)01-RestoreAndBuild.binlog"
+    - task: DotNetCoreCLI@2
+      displayName: Run $(TestType) Tests
+      condition: succeeded()
+      timeoutInMinutes: 15
+      env:
+        VSTEST_TESTHOST_SHUTDOWN_TIMEOUT: 1000
+      inputs:
+        command: test
+        projects: test\NuGet.Core.Tests\NuGet.Build.Tasks.Pack.Test\NuGet.Build.Tasks.Pack.Test.csproj
+        arguments: --no-restore --restore:false --no-build --framework $(TestTargetFramework) --binarylogger:"$(BinlogDirectory)02-RunTests.binlog"
+        testRunTitle: Windows $(TestType) Tests for $(TestProjectName) ($(TestTargetFramework))
+    - task: CmdLine@2
+      displayName: Terminate dotnet.exe processes on cancellation or failure
+      continueOnError: true
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        script: taskkill /im dotnet.exe /f
+    - task: PublishPipelineArtifact@1
+      displayName: Publish MSBuild Binary Logs
+      condition: or(failed(), canceled(), eq(variables['System.Debug'], 'true'))
+      inputs:
+        targetPath: $(BinlogDirectory)
+        artifact: binlog - $(System.JobDisplayName) - Attempt $(System.JobAttempt)
