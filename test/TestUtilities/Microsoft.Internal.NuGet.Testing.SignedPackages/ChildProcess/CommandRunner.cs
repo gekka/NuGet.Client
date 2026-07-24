@@ -59,8 +59,13 @@ namespace Microsoft.Internal.NuGet.Testing.SignedPackages.ChildProcess
                         RedirectStandardOutput = true,
                         RedirectStandardInput = true,
                         CreateNoWindow = true,
+#if NETFRAMEWORK
+                        StandardOutputEncoding = Encoding.Default,
+                        StandardErrorEncoding = Encoding.Default,
+#else
                         StandardOutputEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
                         StandardErrorEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+#endif
                     },
                 })
                 {
@@ -71,6 +76,8 @@ namespace Microsoft.Internal.NuGet.Testing.SignedPackages.ChildProcess
                     process.StartInfo.Environment["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = bool.TrueString;
                     process.StartInfo.Environment["DOTNET_CLI_TELEMETRY_OPTOUT"] = bool.TrueString;
                     process.StartInfo.Environment["SuppressNETCoreSdkPreviewMessage"] = bool.TrueString;
+                    process.StartInfo.Environment["DOTNET_CLI_UI_LANGUAGE"] = "en-US";
+                    process.StartInfo.Environment["NUGET_CLI_LANGUAGE"] = "en-US";
 
                     if (environmentVariables != null)
                     {
